@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Honeywell Document Topic Extractor</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='app.css') }}">
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <div class="brand">HONEYWELL</div>
+      <div class="subtitle">Document Intelligence Console</div>
+    </div>
+    <div class="top-meta">Word topic extraction | Secure upload workflow</div>
+  </header>
+
+  <main class="shell">
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="alert">{{ messages[0] }}</div>
+      {% endif %}
+    {% endwith %}
+
+    <section class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">Online Word Processing Tool</p>
+        <h1>Extract selected Word topics into a new document.</h1>
+        <p>Upload a complete `.docx` file, choose one or more topics from its contents table, and download a focused Word file with text, tables, formatting, and images preserved.</p>
+      </div>
+      <form class="upload-card" action="{{ url_for('upload') }}" method="post" enctype="multipart/form-data">
+        <label for="word_file">Upload Word file</label>
+        <input id="word_file" name="word_file" type="file" accept=".docx" required>
+        <button type="submit">Read Contents Table</button>
+        <p class="small">Supported format: `.docx`</p>
+      </form>
+    </section>
+
+    <section class="feature-grid">
+      <div>
+        <strong>Multiple selection</strong>
+        <span>Choose several topics and export them together.</span>
+      </div>
+      <div>
+        <strong>Image support</strong>
+        <span>Preserves Word media relationships for selected sections.</span>
+      </div>
+      <div>
+        <strong>Deployable app</strong>
+        <span>Built with Flask for web hosting.</span>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

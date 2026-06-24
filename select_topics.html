@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Select Topics | Honeywell Document Topic Extractor</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='app.css') }}">
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <div class="brand">HONEYWELL</div>
+      <div class="subtitle">Document Intelligence Console</div>
+    </div>
+    <a class="top-link" href="{{ url_for('index') }}">Upload another file</a>
+  </header>
+
+  <main class="shell">
+    <section class="panel">
+      <div class="panel-head">
+        <div>
+          <p class="eyebrow">Uploaded document</p>
+          <h1>{{ original_name }}</h1>
+        </div>
+        <div class="counter"><strong>{{ entries|length }}</strong><span>topics found</span></div>
+      </div>
+
+      <div class="toolbar">
+        <label for="topicSearch">Search topic</label>
+        <input id="topicSearch" type="search" placeholder="Type topic name or page number">
+        <button type="button" id="selectVisible">Select visible</button>
+        <button type="button" id="clearSelected">Clear selected</button>
+      </div>
+
+      <form action="{{ url_for('extract') }}" method="post">
+        <input type="hidden" name="file_id" value="{{ file_id }}">
+        <div class="topic-table">
+          <div class="topic-row topic-header">
+            <span>Select</span>
+            <span>Topic</span>
+            <span>Page</span>
+            <span>Source</span>
+          </div>
+          {% for entry in entries %}
+            <label class="topic-row" data-search="{{ (entry.title ~ ' ' ~ entry.page)|lower }}">
+              <span><input type="checkbox" name="topics" value="{{ entry.title }}"></span>
+              <span class="topic-title" style="padding-left: {{ (entry.level - 1) * 18 }}px">{{ entry.title }}</span>
+              <span>{{ entry.page or '-' }}</span>
+              <span>{{ 'Contents table' if entry.source == 'toc' else 'Heading' }}</span>
+            </label>
+          {% endfor %}
+        </div>
+
+        <div class="download-bar">
+          <div><strong id="selectedCount">0</strong> selected topics</div>
+          <button type="submit">Create and Download Word File</button>
+        </div>
+      </form>
+    </section>
+  </main>
+
+  <script>
+    const search = document.querySelector("#topicSearch");
+    const rows = Array.from(document.querySelectorAll(".topic-row:not(.topic-header)"));
+    const selectedCount = document.querySelector("#selectedCount");
+    const selectVisible = document.querySelector("#selectVisible");
+    const clearSelected = document.querySelector("#clearSelected");
+
+    function updateCount() {
+      selectedCount.textContent = document.querySelectorAll("input[name='topics']:checked").length;
+    }
+
+    search.addEventListener("input", () => {
+      const query = search.value.trim().toLowerCase();
+      rows.forEach(row => {
+        row.hidden = query && !row.dataset.search.includes(query);
+      });
+    });
+
+    selectVisible.addEventListener("click", () => {
+      rows.forEach(row => {
+        if (!row.hidden) row.querySelector("input").checked = true;
+      });
+      updateCount();
+    });
+
+    clearSelected.addEventListener("click", () => {
+      document.querySelectorAll("input[name='topics']").forEach(input => input.checked = false);
+      updateCount();
+    });
+
+    document.addEventListener("change", event => {
+      if (event.target.matches("input[name='topics']")) updateCount();
+    });
+  </script>
+</body>
+</html>
